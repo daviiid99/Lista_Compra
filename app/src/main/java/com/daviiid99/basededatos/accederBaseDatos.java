@@ -65,7 +65,11 @@ public class accederBaseDatos extends Activity {
 
 
     }
-
+    public void deleteItem(String producto){
+        String selection = GestorBaseDatos.FeedEntry.PRODUCT_NAME + " LIKE ?";
+        String[] selectionArgs = { producto };
+        int deletedRows = sql.delete(GestorBaseDatos.FeedEntry.TABLE_NAME, selection, selectionArgs);
+    }
 
 
 

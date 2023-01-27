@@ -3,12 +3,17 @@ package com.daviiid99.basededatos;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,31 +29,54 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.add);
         ListView lista = findViewById(R.id.listview);
         Intent intento = new Intent(MainActivity.this, agregarView.class);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN );
-        ArrayList<String> listOfItems =  new ArrayList<String>();
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        ArrayList<String> listOfItems = new ArrayList<String>();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listOfItems);
         lista.setAdapter(adapter);
         accederBaseDatos acceso = new accederBaseDatos(this);
         getDataBaseEntries(acceso, listOfItems, adapter);
         button.setOnClickListener(v -> startActivity(intento));
         getDataBaseEntries(acceso, listOfItems, adapter);
+        String product;
 
+
+        lista.setOnItemClickListener((adapter1, arg1, position, arg3) -> {
+            getItem(adapter1, arg1, position, arg3, acceso);
+        });
     }
 
+    private void getItem(AdapterView adapter1, View arg1, int position, long arg3, accederBaseDatos acceso){
+        // A simple method to retrieve pressed item from listview
+        // Saves item into a variable
+        String producto = adapter1.getItemAtPosition(position).toString();
+        System.out.println("PRODUCTO" + producto);
+        removeDataBaseEntry(acceso, producto);
+    }
+
+
+
     private void getDataBaseEntries(accederBaseDatos acceso, ArrayList<String> listOfItems, ArrayAdapter<String> adapter){
-        // A simple method to read and backup current entries from database
-        ArrayList<String> temp  = acceso.fetchRows();
+    // A simple method to read and backup current entries from database
+    ArrayList<String> temp  = acceso.fetchRows();
 
-        int index = temp.size();
+    int index = temp.size();
 
-        for (int i = 0 ; i < temp.size() - 1; i++){
-            if (!listOfItems.contains(temp.get(i))){
-                listOfItems.add(temp.get(i));
-                adapter.notifyDataSetInvalidated();
-            }
+    for (int i = 0 ; i < temp.size(); i++){
+        if (!listOfItems.contains(temp.get(i))){
+            listOfItems.add(temp.get(i));
         }
+    }
 
-        notifyAdapter(adapter);
+    Collections.sort(listOfItems);
+    notifyAdapter(adapter);
+}
+
+    public void removeDataBaseEntry(accederBaseDatos acceso, String producto){
+        // A simple method to remove choosed entry from database
+        // Show a TOAST on display on delete
+        acceso.deleteItem(producto);
+        finish();
+        startActivity(getIntent());
     }
 
     public void notifyAdapter(ArrayAdapter<String> adapter){
