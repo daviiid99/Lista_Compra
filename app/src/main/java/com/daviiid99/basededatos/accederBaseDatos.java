@@ -71,6 +71,9 @@ public class accederBaseDatos extends Activity {
         int deletedRows = sql.delete(GestorBaseDatos.FeedEntry.TABLE_NAME, selection, selectionArgs);
     }
 
+    public void deleteAll(){
+        sql.execSQL("DELETE FROM lista WHERE _ID >=0");
+    }
 
 
 }
